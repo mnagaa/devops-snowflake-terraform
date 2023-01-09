@@ -1,9 +1,5 @@
-variable "account_id" {
-  default = "065304511047"
-}
-variable "region" {
-  default = "ap-northeast-1"
-}
+variable "account_id" {}
+variable "region" {}
 variable "environment" {
   default = "common"
 }

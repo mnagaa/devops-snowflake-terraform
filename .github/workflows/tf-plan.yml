@@ -3,7 +3,7 @@ name: terraform-plan
 on:
   pull_request:
     paths:
-      - ".github/workflows/tf-plan-garnet.yml"
+      - ".github/workflows/tf-plan.yml"
       - "terraform/**"
   workflow_dispatch:
 

@@ -17,7 +17,7 @@ env:
   TF_VAR_aws_region: "ap-northeast-1"
 
   # snowflake
-  SNOWFLAKE_ACCOUNT: "RP42207"  # account locator
+  SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}  # account locator
   SNOWFLAKE_REGION: "ap-northeast-1.aws"
   SNOWFLAKE_USER: "TERRAFORM_USER"
   SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
@@ -28,27 +28,15 @@ jobs:
   plan-common:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-      statuses: write
     strategy:
       matrix:
         path:
-          - common-github
-          - common-aws
           - common-snowflake
     defaults:
       run:
         working-directory: ./terraform/project
     steps:
       - uses: actions/checkout@v3
-
-      - uses: aws-actions/configure-aws-credentials@master
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/garnet-github-actions-ro-role
-          aws-region: ${{ env.AWS_REGION }}
 
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -65,46 +53,3 @@ jobs:
 
       - name: Plan
         run: terraform -chdir=${{ matrix.path }} plan -no-color -input=false
-
-  # plan-base:
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #     pull-requests: write
-  #     statuses: write
-  #   strategy:
-  #     matrix:
-  #       env:
-  #         - dev
-  #         - stg
-  #         - prd
-  #       stack:
-  #         - snowflake
-  #   defaults:
-  #     run:
-  #       working-directory: ./terraform/garnet
-  #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - uses: aws-actions/configure-aws-credentials@master
-  #       with:
-  #         role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/garnet-github-actions-ro-role
-  #         aws-region: ${{ env.AWS_REGION }}
-
-  #     - uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: ${{ env.TF_VERSION }}
-
-  #     - name: Check format
-  #       run: terraform fmt -check -recursive
-
-  #     - name: Init
-  #       run: terraform -chdir=${{ matrix.env }}/${{ matrix.stack }} init -upgrade -no-color
-
-  #     - name: Check validate
-  #       run: terraform -chdir=${{ matrix.env }}/${{ matrix.stack }} validate
-
-  #     - name: Plan
-  #       run: terraform -chdir=${{ matrix.env }}/${{ matrix.stack }} plan -no-color -input=false

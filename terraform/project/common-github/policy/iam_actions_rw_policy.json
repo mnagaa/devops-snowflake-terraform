@@ -1,0 +1,72 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:DeleteTrail"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "dynamodb:DeleteTableReplica",
+        "rds:Delete*",
+        "dynamodb:DeleteTable",
+        "dynamodb:DeleteBackup",
+        "elasticache:Delete*",
+        "redshift:Delete*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "route53domains:Delete*",
+        "route53:Delete*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateSAMLProvider",
+        "iam:DeleteSAMLProvider",
+        "iam:GetSAMLProvider"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "aws-portal:ModifyAccount",
+        "aws-portal:ModifyPaymentMethods",
+        "aws-portal:ViewPaymentMethods"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "NotAction": [
+        "organizations:*",
+        "account:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "organizations:DescribeOrganization",
+        "account:ListRegions"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

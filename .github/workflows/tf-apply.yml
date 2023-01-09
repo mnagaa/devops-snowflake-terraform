@@ -1,15 +1,22 @@
-name: terraform-apply-common
+name: terraform-apply
 
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'stg'
+        type: choice
+        options:
+          - prd
+          - stg
       stack:
         description: 'Target Stack'
         required: true
         type: choice
         options:
-          - common-aws
-          - common-snowflake
+          - snowflake
       refresh_only:
         description: 'run state refresh only (not apply)'
         required: true
@@ -34,7 +41,7 @@ env:
   SNOWFLAKE_WAREHOUSE: "TERRAFORM_WH"
 
 jobs:
-  apply-common:
+  apply:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     permissions:
@@ -58,15 +65,15 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Init
-        run: terraform -chdir=${{ github.event.inputs.stack }} init -upgrade -no-color
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} init -upgrade -no-color
 
       - name: Plan
-        run: terraform -chdir=${{ github.event.inputs.stack }} plan -no-color -input=false
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} plan -no-color -input=false
 
       - name: Refresh
         if: ${{ github.event.inputs.refresh_only == 'true' }}
-        run: terraform -chdir=${{ github.event.inputs.stack }} apply -no-color -refresh-only -auto-approve
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} apply -no-color -refresh-only -auto-approve
 
       - name: Apply
         if: ${{ github.event.inputs.refresh_only == 'false' }}
-        run: terraform -chdir=${{ github.event.inputs.stack }} apply -no-color -auto-approve
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} apply -no-color -auto-approve

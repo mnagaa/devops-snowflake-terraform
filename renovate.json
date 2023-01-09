@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["after 10am every weekday", "before 11am every weekday"],
+  "labels": ["depends"],
+  "assignees": ["@mnagaa"],
+  "dependencyDashboard": true,
+  "prHourlyLimit": 2,
+  "ignorePaths": [],
+  "postUpdateOptions": ["gomodTidy1.17"],
+  "packageRules": [
+    {
+      "groupName": "auto-merge-terraform",
+      "managers": ["terraform"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "groupName": "auto-merge-actions",
+      "managers": ["github-actions"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    }
+  ]
+}

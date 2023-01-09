@@ -16,7 +16,7 @@ env:
   TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
   TF_VAR_aws_region: "ap-northeast-1"
 
-  # snowflake
+  # Snowflake
   SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}  # account locator
   SNOWFLAKE_REGION: "ap-northeast-1.aws"
   SNOWFLAKE_USER: "TERRAFORM_USER"
@@ -28,6 +28,11 @@ jobs:
   plan-common:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      statuses: write
     strategy:
       matrix:
         path:
@@ -41,6 +46,11 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TF_VERSION }}
+
+      - uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/mnagaa-github-actions-ro-role
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Check format
         run: terraform fmt -check -recursive

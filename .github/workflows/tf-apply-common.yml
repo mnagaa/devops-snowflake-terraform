@@ -1,0 +1,72 @@
+name: terraform-apply-common
+
+on:
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: 'Target Stack'
+        required: true
+        type: choice
+        options:
+          - common-aws
+          - common-snowflake
+      refresh_only:
+        description: 'run state refresh only (not apply)'
+        required: true
+        default: false
+        type: boolean
+
+env:
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: "ap-northeast-1"
+
+  # Terraform
+  TF_VERSION: "1.3.0"
+  TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+  TF_VAR_aws_region: "ap-northeast-1"
+
+  # Snowflake
+  SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}  # account locator
+  SNOWFLAKE_REGION: "ap-northeast-1.aws"
+  SNOWFLAKE_USER: "TERRAFORM_USER"
+  SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+  SNOWFLAKE_ROLE: "TERRAFORM"
+  SNOWFLAKE_WAREHOUSE: "TERRAFORM_WH"
+
+jobs:
+  apply-common:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      statuses: write
+    defaults:
+      run:
+        working-directory: ./terraform/project
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/mnagaa-github-actions-rw-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Init
+        run: terraform -chdir=${{ github.event.inputs.stack }} init -upgrade -no-color
+
+      - name: Plan
+        run: terraform -chdir=${{ github.event.inputs.stack }} plan -no-color -input=false
+
+      - name: Refresh
+        if: ${{ github.event.inputs.refresh_only == 'true' }}
+        run: terraform -chdir=${{ github.event.inputs.stack }} apply -no-color -refresh-only -auto-approve
+
+      - name: Apply
+        if: ${{ github.event.inputs.refresh_only == 'false' }}
+        run: terraform -chdir=${{ github.event.inputs.stack }} apply -no-color -auto-approve

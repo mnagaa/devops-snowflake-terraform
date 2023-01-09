@@ -5,9 +5,9 @@ resource "aws_iam_role" "github-actions-ro-role" {
   assume_role_policy = templatefile(
     "./policy/iam_actions_ro_assume_role_policy.json",
     {
-      account_id  = var.account_id
-      github_org  = local.github_org
-      github_repo = local.github_repo
+      aws_account_id = var.aws_account_id
+      github_org     = local.github_org
+      github_repo    = local.github_repo
     }
   )
 }
@@ -33,9 +33,9 @@ resource "aws_iam_role" "github-actions-rw-role" {
   assume_role_policy = templatefile(
     "./policy/iam_actions_rw_assume_role_policy.json",
     {
-      account_id  = var.account_id
-      github_org  = local.github_org
-      github_repo = local.github_repo
+      aws_account_id = var.aws_account_id
+      github_org     = local.github_org
+      github_repo    = local.github_repo
     }
   )
 }
@@ -62,9 +62,9 @@ resource "aws_iam_role" "github-actions-ecr-rw-role" {
   assume_role_policy = templatefile(
     "./policy/iam_actions_ecr_rw_assume_role_policy.json",
     {
-      account_id  = var.account_id
-      github_org  = local.github_org
-      github_repo = local.github_repo
+      aws_account_id = var.aws_account_id
+      github_org     = local.github_org
+      github_repo    = local.github_repo
     }
   )
 }

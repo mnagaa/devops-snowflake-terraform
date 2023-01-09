@@ -1,5 +1,5 @@
 locals {
-  github_actions_oidc_arn = "arn:aws:iam::${var.account_id}:oidc-provider/token.actions.githubusercontent.com"
+  github_actions_oidc_arn = "arn:aws:iam::${var.aws_account_id}:oidc-provider/token.actions.githubusercontent.com"
   github_org              = "mnagaa"
   github_repo             = "devops-snowflake-terraform"
 }

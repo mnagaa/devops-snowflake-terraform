@@ -44,16 +44,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: aws-actions/configure-aws-credentials@master
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/mnagaa-github-actions-ro-role
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Set up go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.9
-        id: go
+      - name: Setup Go
+        uses: ./.github/actions/setup_go
 
       - name: Initialize golang-migrate
         run: |

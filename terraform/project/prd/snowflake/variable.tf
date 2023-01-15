@@ -1,5 +1,5 @@
 variable "environment" {
-  default = "stg"
+  default = "prd"
 }
 variable "project" {
   default = "mnagaa"

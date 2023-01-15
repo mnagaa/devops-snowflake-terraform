@@ -64,5 +64,5 @@ jobs:
           SCHEMA=$( echo ${{ github.event.inputs.schema }} | sed 's/.*\///g')
 
           # Migrate
-          migrate -database "snowflake://$SNOWFLAKE_USER:$encoded_password@$SNOWFLAKE_ACCOUNT.$SNOWFLAKE_REGION/$SCHEMA/$DATABASE \
+          migrate -database "snowflake://$SNOWFLAKE_USER:$encoded_password@$SNOWFLAKE_ACCOUNT.$SNOWFLAKE_REGION/$SCHEMA/$DATABASE" \
                   -path schemas/snowflake/${{ github.event.inputs.schema }}/ddl up

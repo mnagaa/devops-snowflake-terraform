@@ -63,3 +63,45 @@ jobs:
 
       - name: Plan
         run: terraform -chdir=${{ matrix.path }} plan -no-color -input=false
+
+  plan-project:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      statuses: write
+    strategy:
+      matrix:
+        stage:
+          - stg
+          - prd
+        module:
+          - snowflake
+    defaults:
+      run:
+        working-directory: ./terraform/project
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/mnagaa-github-actions-ro-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check format
+        run: terraform fmt -check -recursive
+
+      - name: Init
+        run: terraform -chdir=${{ matrix.stage }}/${{ matrix.module }} init -upgrade -no-color
+
+      - name: Check validate
+        run: terraform -chdir=${{ matrix.stage }}/${{ matrix.module }} validate
+
+      - name: Plan
+        run: terraform -chdir=${{ matrix.stage }}/${{ matrix.module }} plan -no-color -input=false

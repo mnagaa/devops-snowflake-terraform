@@ -11,8 +11,8 @@ on:
         options:
           - prd
           - stg
-      stack:
-        description: 'Target Stack'
+      stage:
+        description: 'Target Stage'
         required: true
         type: choice
         options:
@@ -65,15 +65,15 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Init
-        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} init -upgrade -no-color
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stage }} init -upgrade -no-color
 
       - name: Plan
-        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} plan -no-color -input=false
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stage }} plan -no-color -input=false
 
       - name: Refresh
         if: ${{ github.event.inputs.refresh_only == 'true' }}
-        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} apply -no-color -refresh-only -auto-approve
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stage }} apply -no-color -refresh-only -auto-approve
 
       - name: Apply
         if: ${{ github.event.inputs.refresh_only == 'false' }}
-        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stack }} apply -no-color -auto-approve
+        run: terraform -chdir=${{ github.event.inputs.environment }}/${{ github.event.inputs.stage }} apply -no-color -auto-approve

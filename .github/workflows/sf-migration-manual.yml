@@ -1,0 +1,73 @@
+name: sf-migration-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      schema:
+        description: 'Target schema'
+        required: true
+        type: choice
+        options:
+          - raw/sandbox
+          - app/sandbox
+          - mart/sandbox
+
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        default: stg
+        options:
+          - prd
+          - stg
+
+env:
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: "ap-northeast-1"
+
+  # Snowflake
+  SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}  # account locator
+  SNOWFLAKE_REGION: "ap-northeast-1.aws"
+  SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+  SYSTEM_ENV: ${{ github.event.inputs.environment }}
+
+jobs:
+  migrate-snowflake:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/mnagaa-github-actions-ro-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Go
+        uses: ./.github/actions/setup_go
+
+      - name: Initialize golang-migrate
+        run: |
+          go install -tags 'snowflake' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+      - name: Install command line tools
+        run: |
+          sudo apt-get install -y nkf
+
+      - name: Migrate up
+        run: |
+          encoded_password=$(echo $SNOWFLAKE_PASSWORD | nkf -WwMQ | sed 's/=$//g' | tr = % | tr -d '\n')
+
+          DATABASE=$( echo ${{ github.event.inputs.schema }} | sed 's/\/.*//g')
+          DATABASE=${SYSTEM_ENV}_${DATABASE}_db
+          SCHEMA=$( echo ${{ github.event.inputs.schema }} | sed 's/.*\///g')
+
+          # Migrate
+          migrate -database "snowflake://$SNOWFLAKE_USER:$encoded_password@$SNOWFLAKE_ACCOUNT.$SNOWFLAKE_REGION/$SCHEMA/$DATABASE \
+                  -path schemas/snowflake/${{ github.event.inputs.schema }}/ddl up

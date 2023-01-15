@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       schema:
-        description: 'Target schema'
+        description: 'Target database & schema'
         required: true
         type: choice
         options:
@@ -12,8 +12,8 @@ on:
           - app/sandbox
           - mart/sandbox
 
-      environment:
-        description: 'Target environment'
+      stage:
+        description: 'Target stage'
         required: true
         type: choice
         default: stg
@@ -31,7 +31,7 @@ env:
   SNOWFLAKE_USER: "TERRAFORM_USER"
   SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
 
-  SYSTEM_ENV: ${{ github.event.inputs.environment }}
+  SYSTEM_ENV: ${{ github.event.inputs.stage }}
 
 jobs:
   migrate-snowflake:
@@ -45,8 +45,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Go
-        uses: ./.github/actions/setup_go
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
       - name: Initialize golang-migrate
         run: |

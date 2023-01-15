@@ -15,5 +15,5 @@ resource "snowflake_schema_grant" "mart-sandbox-ownership" {
   database_name          = snowflake_database.mart.name
   schema_name            = snowflake_schema.mart-sandbox.name
   privilege              = "OWNERSHIP"
-  roles                  = [var.roles.developer]
+  roles                  = [local.snowflake_role.developer]
 }

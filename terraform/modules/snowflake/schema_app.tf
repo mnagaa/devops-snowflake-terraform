@@ -15,5 +15,5 @@ resource "snowflake_schema_grant" "app-sandbox-ownership" {
   database_name          = snowflake_database.app.name
   schema_name            = snowflake_schema.app-sandbox.name
   privilege              = "OWNERSHIP"
-  roles                  = [var.roles.developer]
+  roles                  = [local.snowflake_role.developer]
 }

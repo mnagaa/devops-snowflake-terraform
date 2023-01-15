@@ -21,5 +21,6 @@ locals {
     datadog       = "DATADOG"
     dbt           = "DBT"
     terraform     = "TERRAFORM" // WebUIから作成
+    developer     = "DEVELOPER" // WebUIから作成
   }
 }

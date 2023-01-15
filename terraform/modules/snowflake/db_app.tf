@@ -93,7 +93,6 @@ resource "snowflake_database_grant" "app-db-rw" {
 
 // schema privileges
 // https://docs.snowflake.com/ja/user-guide/security-access-control-privileges.html#schema-privileges
-// NOTE: 'ALL' can not be assigned as privilege.
 resource "snowflake_schema_grant" "app-db-rw" {
   provider               = snowflake.security_admin
   database_name          = snowflake_database.app.name

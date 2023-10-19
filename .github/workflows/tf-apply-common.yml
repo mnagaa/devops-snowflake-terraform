@@ -46,7 +46,7 @@ jobs:
       run:
         working-directory: ./terraform/project
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: aws-actions/configure-aws-credentials@master
         with:

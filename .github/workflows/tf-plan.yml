@@ -26,7 +26,7 @@ env:
 
 jobs:
   plan-common:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       id-token: write
@@ -66,7 +66,7 @@ jobs:
         run: terraform -chdir=${{ matrix.path }} plan -no-color -input=false
 
   plan-project:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       id-token: write
